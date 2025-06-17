@@ -1,0 +1,179 @@
+:root {
+    --app-green: #7DBAAB;
+    --app-pink: #E6007E;
+    --app-purple: #5C0F8B;
+    --app-grey: #54565A;
+}
+
+.uj-webrtc-container .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+.uj-webrtc-container .bg-white {
+    background-color: #ffffff;
+}
+
+.uj-webrtc-container .text-black {
+    color: #000000;
+}
+
+.uj-webrtc-container .rounded-lg {
+    border-radius: 0.5rem;
+    /* 8px */
+}
+
+.uj-webrtc-container .p-4 {
+    padding: 1rem;
+    /* 16px */
+}
+
+.uj-webrtc-container .w-88 {
+    width: 22rem;
+    /* 352px */
+}
+
+.uj-webrtc-container .flex {
+    display: flex;
+}
+
+.uj-webrtc-container .flex-col {
+    flex-direction: column;
+}
+
+.uj-webrtc-container .items-center {
+    align-items: center;
+}
+
+.uj-webrtc-container .grid {
+    display: grid;
+}
+
+.uj-webrtc-container .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.uj-webrtc-container .gap-4 {
+    gap: 1rem;
+    /* 16px */
+}
+
+.uj-webrtc-container .mt-8 {
+    margin-top: 2rem;
+    /* 32px */
+}
+
+.uj-webrtc-container .text-green-600 {
+    color: #16a34a;
+}
+
+.uj-webrtc-container .button-shadow {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+.uj-notif {
+    position: absolute;
+    top: 2px;
+    padding: 0px 10px;
+    width: auto;
+}
+
+/* Webphone Widget */
+#uj-webphone-widget {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.uj-webrtc-container .div-height {
+    height: 450px;
+    justify-content: space-around;
+}
+
+.uj-webrtc-container .uj-btn p {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 22px;
+    margin: 0px;
+}
+
+.uj-webrtc-container .uj-btn span {
+    font-size: 11px;
+    line-height: 11px;
+    font-weight: 600;
+}
+
+.uj-webrtc-container .uj-btn.uj-btn-green {
+    color: var(--app-green);
+}
+
+.uj-webrtc-container .uj-btn.uj-btn-red {
+    color: var(--app-pink);
+}
+
+.uj-webrtc-container .uj-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px 10px;
+    border: 2px solid #b6b6bb;
+    border-radius: 6px;
+    background-color: #f8f8f8;
+    color: #222;
+    text-align: center;
+    min-width: 100px;
+    height: 46px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.uj-webrtc-container .uj-btn:hover {
+    background-color: var(--app-green);
+    color: white;
+}
+
+.uj-webrtc-container .uj-avatar .uj-name-prefix {
+    font-size: 53px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.uj-webrtc-container .uj-avatar {
+    color: white;
+    background-color: #c6b6e9;
+    padding: 20px;
+    border-radius: 77%;
+    width: 124px;
+    margin: auto;
+}
+
+.uj-webrtc-container .callingDisplayName {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.uj-webrtc-container .callingDisplayNumber {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--app-grey);
+}
+
+.uj-webrtc-container .uj-line-Transfer {
+    width: 100%;
+}
+
+.uj-webrtc-container .uj-line-Transfer .uj-line-transfer-btn {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 5px;
+}

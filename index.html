@@ -1,0 +1,440 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/fa.6.7.2all.min.css">
+    <script src="assets/js/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/sip.min.js"></script>
+    <script src="assets/js/tailwindcss.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
+    <script src="assets/js/uj-phone.js"></script>
+    <script src="assets/js/moment.min.js"></script>
+</head>
+
+<body>
+    <div class="uj-login-form fixed inset-0 flex items-center justify-center bg-gray-100">
+        <div class="bg-white shadow-lg rounded-lg p-6 w-96">
+            <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="profileName" class="block text-sm font-medium text-gray-700">Profile Name:</label>
+                    <input type="text" id="profileName" placeholder="Enter Profile Name" required
+                        class="mt-1 block w-full border-0 rounded-md " />
+                </div>
+
+                <div>
+                    <label for="wssServer" class="block text-sm font-medium text-gray-700">WSS Server:</label>
+                    <input type="text" id="wssServer" placeholder="wss://123.12.12.123:998" required
+                        class="mt-1 block w-full border-0 rounded-md " />
+                </div>
+
+                <div>
+                    <label for="SipDomain" class="block text-sm font-medium text-gray-700">SIP Domain:</label>
+                    <input type="text" id="SipDomain" placeholder="Enter SIP Domain" required
+                        class="mt-1 block w-full border-0 rounded-md " />
+                </div>
+
+                <div>
+                    <label for="SipUsername" class="block text-sm font-medium text-gray-700">SIP Username:</label>
+                    <input type="text" id="SipUsername" placeholder="Enter SIP Username" required
+                        class="mt-1 block w-full border-0 rounded-md " />
+                </div>
+
+                <div>
+                    <label for="SipPassword" class="block text-sm font-medium text-gray-700">SIP Password:</label>
+                    <input type="password" id="SipPassword" placeholder="Enter SIP Password" required
+                        class="mt-1 block w-full border-0 rounded-md " />
+                </div>
+
+                <button type="button" onclick="saveLoginDetails()"
+                    class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Save
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="uj-webrtc-container">
+
+        <button title="Logout" class="uj-btn fixed top-4 right-4 z-50" style="min-width: 50px;" onclick="logout()">
+            <i class="fa fa-sign-out"></i>
+        </button>
+
+        <button title="History" class="uj-btn fixed top-4 right-20 z-50" style="min-width: 50px;" onclick="toggleCallHistory()">
+            History
+        </button>
+
+        <div class="uj-call-history" style="display: none;">
+
+        </div>
+
+        <!-- Webphone Widget -->
+        <div id="uj-webphone-widget" class="shadow-lg bg-white text-black rounded-lg p-4 w-88">
+            <h3><b id="regStatus">Starting connection ....</b></h3>
+            <div class="uj-notif"></div>
+            <div class="uj-divInCallContainer" style="display:none">
+                <div class="flex flex-col items-center div-height">
+                    <div class="text-center">
+                        <audio id="line-transfer-remoteAudio" class="d-none"> </audio>
+                        <audio id="line-conference-remoteAudio" class="d-none"> </audio>
+                        <audio id="line-remoteAudio" class="d-none"> </audio>
+
+                        <div class="text-center">
+                            <div class="uj-avatar">
+                                <i class="fa fa-user fa-5x"></i>
+                                <span class="uj-name-prefix"></span>
+                            </div>
+                            <div class=callingDisplayName>Unknown</div>
+                            <div class=callingDisplayNumber></div>
+                        </div>
+                        <h3><span id="line-timer"></span></h3>
+                        <span id="line-msg"></span>
+                    </div>
+
+                    <div class="uj-inCallButtons grid grid-cols-3 gap-4 mt-8">
+                        <!-- Mute/Unmute -->
+                        <button id="line-btn-SpeakerOff" onclick="SpeakerOffSession()" class="uj-btn" title="Voice Off">
+                            <i class="fa fa-volume-off "></i>
+                            <span>Speaker Off</p>
+                        </button>
+
+                        <button id="line-btn-SpeakerOn" onclick="SpeakerOnSession()" class="uj-btn uj-btn-red d-none"
+                            title="Voice On">
+                            <i class="fa fa-volume-up "></i>
+                            <span>Speaker On</p>
+                        </button>
+
+                        <!-- Mute/Unmute -->
+                        <button id="line-btn-Mute" onclick="MuteSession()" class="uj-btn" title="Mute">
+                            <i class="fa fa-microphone-slash "></i>
+                            <span>Mute</p>
+                        </button>
+
+                        <button id="line-btn-Unmute" onclick="UnmuteSession()" class="uj-btn uj-btn-red d-none"
+                            title="Unmute">
+                            <i class="fa fa-microphone "></i>
+                            <span>Unmute</p>
+                        </button>
+
+                        <!-- Hold/Unhold -->
+                        <button id="line-btn-Hold" onclick="holdSession()" class="uj-btn" title="Hold Call">
+                            <i class="fa fa-pause "></i>
+                            <span>Hold</p>
+                        </button>
+
+                        <button id="line-btn-Unhold" onclick="unholdSession()" class="uj-btn uj-btn-red d-none"
+                            title="Resume Call">
+                            <i class="fa fa-play "></i>
+                            <span>Resume</p>
+                        </button>
+                        <!-- DTMF Menu -->
+                        <button id="line-btn-ShowDtmf" onclick="ShowDtmfMenu(true)" class="uj-btn" title="Send DTMF">
+                            <i class="fa fa-keyboard-o "></i>
+                            <span>DTMF</p>
+                        </button>
+
+                        <!-- Transfer Call -->
+                        <button id="line-btn-Transfer" onclick="StartTransferSession()" class="uj-btn"
+                            title="Transfer Call">
+                            <i class="fa fa-reply " style="transform: rotateY(180deg)"></i>
+                            <span>Transfer</p>
+                        </button>
+
+                        <button id="line-btn-CancelTransfer" onclick="CancelTransferSession()"
+                            class="uj-btn uj-btn-red d-none" title="Cancel Transfer">
+                            <i class="fa fa-reply " style="transform: rotateY(180deg)"></i>
+                            <span>Cancel</p>
+                        </button>
+                    </div>
+                    <div id="line-Transfer" class="uj-line-Transfer" style="display:none">
+                        <input type="text" id="line-txt-FindTransfer" class="form-control">
+                        <div class="uj-line-transfer-btn">
+                            <button id="line-btn-blind-transfer" class="uj-btn" onclick="BlindTransfer()"><i
+                                    class="fa fa-reply" style="transform: rotateY(180deg)"></i> <span>Blind
+                                    Transfer</span> </button>
+                            <button id="line-btn-attended-transfer" class="uj-btn" onclick="AttendedTransfer()"><i
+                                    class="fa fa-reply-all" style="transform: rotateY(180deg)"></i><span>Attended
+                                    Transfer</span> </button>
+                            <button id="line-btn-complete-attended-transfer" class="uj-btn" style="display:none"><i
+                                    class="fa fa-reply-all" style="transform: rotateY(180deg)"></i><span>Complete
+                                    Transfer </span> </button>
+                            <button id="line-btn-cancel-attended-transfer" class="uj-btn" style="display:none"><i
+                                    class="fa fa-phone" style="transform: rotate(135deg);"></i> <span>Cancel
+                                    Transfer</span></button>
+                            <button id="line-btn-terminate-attended-transfer" class="uj-btn" style="display:none"><i
+                                    class="fa fa-phone" style="transform: rotate(135deg);"></i><span>End Transfer Call
+                                </span> </button>
+                        </div>
+                    </div>
+                    <div class="uj-divDTMFmenu" style="display:none">
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <button class="uj-btn" onclick="sendDTMF(null,'1')">
+                                <p class="">1</p>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'2')">
+                                <p class="">2</p> <span class="">ABC</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'3')">
+                                <p class="">3</p> <span class="">DEF</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'4')">
+                                <p class="">4</p> <span class="">GHI</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'5')">
+                                <p class="">5</p> <span class="">JKL</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'6')">
+                                <p class="">6</p> <span class="">MNO</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'7')">
+                                <p class="">7</p> <span class="">PQRS</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'8')">
+                                <p class="">8</p> <span class="">TUV</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'9')">
+                                <p class="">9</p> <span class="">WXYZ</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'*')">
+                                <p style="font-size:50px; margin-bottom: -20px" class="">*</p>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'0')">
+                                <p class="">0</p> <span class="">+</span>
+                            </button>
+                            <button class="uj-btn" onclick="sendDTMF(null,'#')">
+                                <p class="">#</p>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex" style=" justify-content: space-around; width: 100%;">
+                        <!-- End Call -->
+                        <button id="line-btn-End" onclick="endSession()" class="uj-btn uj-btn-red" title="End Call">
+                            <i class="fa fa-phone fa-2x" style="transform: rotate(135deg);"></i>
+                            <span style="margin-top:-5px" class="">End</span>
+                        </button>
+                        <button id="line-btn-HideDTMF" class="uj-btn" onclick="ShowDtmfMenu(false)"> Hide </button>
+                    </div>
+                </div>
+            </div>
+            <div class="uj-divDialPad">
+                <div class="flex flex-col items-center div-height">
+                    <input type="tel" id="dialText" placeholder="Phone Number..." oninput="handleDialInput(this, event)"
+                        onkeydown="dialOnkeydown(event, this)"
+                        style="border: 0px; font-size: 2rem; font-weight: 600;padding:0px"
+                        class="form-control text-center" maxlength="15" />
+                    <div class="grid grid-cols-3 gap-4">
+                        <button class="uj-btn" onclick="addNumber2('1')">
+                            <p class="">1</p>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('2')">
+                            <p class="">2</p> <span class="">ABC</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('3')">
+                            <p class="">3</p> <span class="">DEF</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('4')">
+                            <p class="">4</p> <span class="">GHI</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('5')">
+                            <p class="">5</p> <span class="">JKL</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('6')">
+                            <p class="">6</p> <span class="">MNO</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('7')">
+                            <p class="">7</p> <span class="">PQRS</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('8')">
+                            <p class="">8</p> <span class="">TUV</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('9')">
+                            <p class="">9</p> <span class="">WXYZ</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('*')">
+                            <p style="font-size:50px; margin-bottom: -20px;" class="">*</p>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('0')">
+                            <p class="">0</p> <span class="">+</span>
+                        </button>
+                        <button class="uj-btn" onclick="addNumber2('#')">
+                            <p class="">#</p>
+                        </button>
+                    </div>
+                    <div>
+                        <button title="Dial" type="button" onclick="DialByLine()" class="uj-btn">
+                            <i class="fa fa-phone fa-2x text-green-600"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="line-AnswerCall" class="uj-DivAnswerCall" style="display:none">
+                <div class="flex flex-col items-center div-height">
+                    <div class="text-center">
+
+                        <div class="uj-avatar">
+                            <i class="fa fa-user fa-5x"></i>
+                            <span class="uj-name-prefix"></span>
+                        </div>
+                        <div class=callingDisplayName>Unknown</div>
+                        <div class=callingDisplayNumber></div>
+                    </div>
+                    <div style="justify-content: space-around; width: 100%;" class="flex">
+                        <button onclick="RejectCall()" class="rejectButton uj-btn uj-btn-red" title="Reject">
+                            <i class="fa fa-phone fa-2x" style="transform: rotate(135deg);"></i>
+                        </button>
+                        <button onclick="AnswerAudioCall()" class="uj-btn answerButton" title="Answer">
+                            <i class="fa fa-phone text-green-600 fa-2x "></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+            if (localStorage.getItem("wssServer") && localStorage.getItem("SipDomain") && localStorage.getItem("SipUsername") && localStorage.getItem("SipPassword")) {
+                $(".uj-login-form").hide();
+                $(".uj-webrtc-container").show();
+                InitUi();
+            } else {
+                $(".uj-login-form").show();
+                $(".uj-webrtc-container").hide();
+            }
+        });
+
+        function saveLoginDetails() {
+            const profileName = document.getElementById("profileName").value;
+            const wssServer = document.getElementById("wssServer").value;
+            const SipDomain = document.getElementById("SipDomain").value;
+            const SipUsername = document.getElementById("SipUsername").value;
+            const SipPassword = document.getElementById("SipPassword").value;
+
+            localStorage.setItem("profileName", profileName);
+            localStorage.setItem("wssServer", wssServer);
+            localStorage.setItem("SipDomain", SipDomain);
+            localStorage.setItem("SipUsername", SipUsername);
+            localStorage.setItem("SipPassword", SipPassword);
+
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+        function addCallToHistory(call) {
+            const calls = JSON.parse(localStorage.getItem('callHistory') || '[]');
+            const newCall = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                duration: call.duration || 0,
+                number: call.number || '',
+                name: call.name || '',
+                direction: call.direction || 'inbound',
+                status: call.status || 'Missed',
+                recording: call.recording || null
+            };
+            calls.unshift(newCall);
+            localStorage.setItem('callHistory', JSON.stringify(calls));
+            RefreshCallHistory();
+        }
+        function getCallHistory() {
+            return JSON.parse(localStorage.getItem('callHistory') || '[]');
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return '';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatDate(isoString) {
+            const d = new Date(isoString);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function groupCallsByDay(calls) {
+            const groups = {};
+            calls.forEach(call => {
+                const day = new Date(call.timestamp).toLocaleDateString();
+                if (!groups[day]) groups[day] = [];
+                groups[day].push(call);
+            });
+            return groups;
+        }
+
+        function RefreshCallHistory() {
+            const calls = getCallHistory();
+            if (calls.length === 0) {
+                document.querySelector('.uj-call-history').innerHTML = `
+            <div class="text-center text-gray-500 p-4">No calls in history</div>
+        `;
+                return;
+            }
+            const grouped = groupCallsByDay(calls);
+            let historyHtml = '<div class="hist-height overflow-y-auto">';
+            Object.entries(grouped).forEach(([day, dayCalls]) => {
+                historyHtml += `
+            <div class="mb-4">
+                <div class="px-4 py-2 bg-[#f3f7fa] text-sm font-semibold text-gray-600">${day}</div>
+                <div class="divide-y divide-[#e6d9e0]">
+        `;
+                dayCalls.forEach(call => {
+                    const directionIcon = call.direction === 'inbound'
+                        ? '<i class="fa fa-arrow-left text-green-500"></i>'
+                        : '<i class="fa fa-arrow-right text-blue-500"></i>';
+                    historyHtml += `
+                <div class="p-3 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex items-center space-x-3">
+                        ${directionIcon}
+                        <div>
+                            <div class="font-medium">${call.name || call.number}</div>
+                            <div class="text-xs text-gray-400 flex items-center space-x-2">
+                                <i class="fa fa-clock text-gray-300"></i>
+                                <b>${formatDuration(call.duration) || call.status}</b>
+                                <span>${formatDate(call.timestamp)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="DialFromHistory('${call.number}', '${call.name || ''}')" class="text-gray-500 hover:text-green-700">
+                        <i class="fa fa-phone"></i>
+                    </button>
+                </div>
+            `;
+                });
+                historyHtml += '</div></div>';
+            });
+            historyHtml += '</div>';
+            document.querySelector('.uj-call-history').innerHTML = historyHtml;
+        }
+
+        // Helper for redial button
+        function DialFromHistory(number, name) {
+            $('#dialText').val(number);
+            // Optionally, you can auto-dial here:
+            // DialByLine();
+        }
+
+        function toggleCallHistory() {
+            const historyDiv = document.querySelector('.uj-call-history');
+            if (historyDiv.style.display === 'none' || historyDiv.style.display === '') {
+                historyDiv.style.display = 'block';
+                $("#uj-webphone-widget").hide();
+                RefreshCallHistory();
+            } else {
+                historyDiv.style.display = 'none';
+                $("#uj-webphone-widget").show();
+            }
+        }
+
+    </script>
+</body>
+
+</html>
