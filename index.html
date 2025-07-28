@@ -60,7 +60,8 @@
             <i class="fa fa-sign-out"></i>
         </button>
 
-        <button title="History" class="uj-btn fixed top-4 right-20 z-50" style="min-width: 50px;" onclick="toggleCallHistory()">
+        <button title="History" class="uj-btn fixed top-4 right-20 z-50" style="min-width: 50px;"
+            onclick="toggleCallHistory()">
             History
         </button>
 
@@ -295,16 +296,24 @@
 
     </div>
 
+    <div class="uj-profile-list">
+
+    </div>
+
     <script>
 
         $(document).ready(function () {
             if (localStorage.getItem("wssServer") && localStorage.getItem("SipDomain") && localStorage.getItem("SipUsername") && localStorage.getItem("SipPassword")) {
                 $(".uj-login-form").hide();
                 $(".uj-webrtc-container").show();
+                $(".uj-profile-list").hide();
                 InitUi();
+            } else if (JSON.parse(localStorage.getItem('profiles') || '[]').length > 0) {
+                showProfileList();
             } else {
                 $(".uj-login-form").show();
                 $(".uj-webrtc-container").hide();
+                $(".uj-profile-list").hide();
             }
         });
 
@@ -315,18 +324,95 @@
             const SipUsername = document.getElementById("SipUsername").value;
             const SipPassword = document.getElementById("SipPassword").value;
 
+            // Save current session
             localStorage.setItem("profileName", profileName);
             localStorage.setItem("wssServer", wssServer);
             localStorage.setItem("SipDomain", SipDomain);
             localStorage.setItem("SipUsername", SipUsername);
             localStorage.setItem("SipPassword", SipPassword);
 
+            // Save to profiles list
+            let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+            // Remove any existing profile with same name
+            profiles = profiles.filter(p => p.profileName !== profileName);
+            profiles.push({ profileName, wssServer, SipDomain, SipUsername, SipPassword });
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+
             location.reload();
         }
 
         function logout() {
-            localStorage.clear();
+            // Remove only current session keys, keep callHistory and profiles
+            localStorage.removeItem("profileName");
+            localStorage.removeItem("wssServer");
+            localStorage.removeItem("SipDomain");
+            localStorage.removeItem("SipUsername");
+            localStorage.removeItem("SipPassword");
+            showProfileList();
+        }
+
+        function showProfileList() {
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+            let html = '<div class="bg-white shadow-lg rounded-lg p-6 w-96 mx-auto mt-20">';
+            html += '<h2 class="text-2xl font-bold mb-4 text-center">Select Profile</h2>';
+            if (profiles.length === 0) {
+                html += '<div class="text-center text-gray-500">No saved profiles.</div>';
+            } else {
+                html += '<ul class="space-y-2">';
+                profiles.forEach((p, idx) => {
+                    html += `<li class='flex gap-2'>
+                        <button class="flex-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 py-2 px-4 rounded-md text-left" onclick="loginWithProfile(${idx})">${p.profileName} <span class='text-xs text-gray-400'>(${p.SipUsername})</span></button>
+                        <button class='bg-yellow-100 hover:bg-yellow-200 text-yellow-800 py-2 px-3 rounded-md' title='Edit' onclick='editProfile(${idx})'><i class="fa fa-edit"></i></button>
+                        <button class='bg-red-100 hover:bg-red-200 text-red-800 py-2 px-3 rounded-md' title='Delete' onclick='deleteProfile(${idx})'><i class="fa fa-trash"></i></button>
+                    </li>`;
+                });
+                html += '</ul>';
+            }
+            html += '<div class="mt-6 text-center"><button onclick="showLoginForm()" class="text-blue-600 hover:underline">Add New Profile</button></div>';
+            html += '</div>';
+            $(".uj-profile-list").html(html).show();
+            $(".uj-login-form").hide();
+            $(".uj-webrtc-container").hide();
+        }
+        // Delete profile from the list
+        function deleteProfile(idx) {
+            let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+            if (!profiles[idx]) return;
+            profiles.splice(idx, 1);
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+            showProfileList();
+        }
+        // Edit profile before login
+        function editProfile(idx) {
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+            if (!profiles[idx]) return;
+            const p = profiles[idx];
+            $("#profileName").val(p.profileName);
+            $("#wssServer").val(p.wssServer);
+            $("#SipDomain").val(p.SipDomain);
+            $("#SipUsername").val(p.SipUsername);
+            $("#SipPassword").val(p.SipPassword);
+            $(".uj-login-form").show();
+            $(".uj-webrtc-container").hide();
+            $(".uj-profile-list").hide();
+        }
+
+        function loginWithProfile(idx) {
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+            if (!profiles[idx]) return;
+            const p = profiles[idx];
+            localStorage.setItem("profileName", p.profileName);
+            localStorage.setItem("wssServer", p.wssServer);
+            localStorage.setItem("SipDomain", p.SipDomain);
+            localStorage.setItem("SipUsername", p.SipUsername);
+            localStorage.setItem("SipPassword", p.SipPassword);
             location.reload();
+        }
+
+        function showLoginForm() {
+            $(".uj-login-form").show();
+            $(".uj-webrtc-container").hide();
+            $(".uj-profile-list").hide();
         }
         function addCallToHistory(call) {
             const calls = JSON.parse(localStorage.getItem('callHistory') || '[]');
